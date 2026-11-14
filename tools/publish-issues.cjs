@@ -25,7 +25,7 @@ async function main(){
   const issues=await api('/issues?state=open&sort=created&direction=asc&per_page=100&page='+page);
   for(const issue of issues){if(!authorized(issue,repo.owner.id))continue;
    try{const result=ingest(current,issue,repo.owner.id,{RZL,publish});current=result.data;changed=changed||!result.duplicate;state.accepted.push({number:issue.number,id:result.entry.id,revision:result.entry.revision});}
-   catch(error){state.rejected.push({number:issue.number,error:error.message});await commentsOnce(issue.number,'RZL: Nicht veröffentlicht. '+error.message+' Bitte die Eingabe berichtigen und erneut öffnen.');}
+   catch(error){if(!error.isInputError)throw error;state.rejected.push({number:issue.number,error:error.message});await commentsOnce(issue.number,'RZL: Nicht veröffentlicht. '+error.message+' Bitte die Eingabe berichtigen und erneut öffnen.');}
   }
   if(issues.length<100)break;
  }
