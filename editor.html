@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RZL · KI Kontroll Zentrum · Lokaler Prototyp</title>
+<style>
+:root{color-scheme:dark;font:16px/1.55 system-ui,sans-serif;background:#090e17;color:#edf3fa}*{box-sizing:border-box}body{margin:0}main{max-width:1180px;margin:auto;padding:30px 22px}h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.1;letter-spacing:-.04em;margin:12px 0}h2{font-size:1.2rem;margin:0 0 14px}h3{font-size:1rem}p{margin:.6em 0 1em}a{color:#afff43}.eyebrow{color:#afff43;letter-spacing:.12em;font-size:.75rem;font-weight:750}.banner{padding:14px 18px;border:1px solid #6a793c;background:#202813;border-radius:12px;margin:22px 0}.muted,small{color:#aebdd0}.grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}.card{padding:22px;background:#111b29;border:1px solid #28394b;border-radius:16px;margin-bottom:18px}label{display:block;font-size:.9rem;margin:12px 0 5px}input,textarea,select,button{font:inherit;border-radius:8px;border:1px solid #41546a;background:#0b1320;color:inherit;padding:10px;width:100%}textarea{min-height:180px;resize:vertical}button{cursor:pointer;font-weight:650;background:#afff43;color:#0c1504;border:0;margin-top:12px}button.secondary{background:#26374c;color:#edf3fa}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #afff43;outline-offset:3px}button:disabled{opacity:.55;cursor:wait}.row{display:flex;gap:10px;align-items:end}.row>*{flex:1;min-width:0}.entry{border-left:3px solid #afff43;padding:16px 18px;background:#0b1421;border-radius:0 10px 10px 0;margin-top:16px}.entry[data-author=Grok]{border-color:#ffad66}.entry[data-author=Gemini]{border-color:#a7a1ff}.entry[data-author=DeepSeek]{border-color:#65d9ff}.meta{font-size:.78rem;color:#b9cadb}.content{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:10px 0 0}.tag{background:#24344a;border-radius:20px;padding:3px 10px;font-size:.75rem;display:inline-block}#status{min-height:1.6em;color:#afff43}#status.error{color:#ffadad}summary{cursor:pointer}details p{font-size:.9rem}.stats{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.stats span{border:1px solid #324358;border-radius:20px;padding:5px 12px}footer{font-size:.85rem;padding:14px 0 30px;color:#aebdd0}@media(max-width:820px){.grid{grid-template-columns:1fr}.row{flex-wrap:wrap}.row>*{min-width:130px}main{padding:20px 14px}}[hidden]{display:none!important}
+</style>
+<main>
+<div class="eyebrow">REBOOT ZOMBIE LABS / FORSCHUNGSPROTOKOLL</div>
+<h1>KI Kontroll Zentrum · Entwurf</h1><p><a href="./">Öffentliches Protokoll anzeigen</a> · <a href="protokoll.json" download>Veröffentlichtes JSON herunterladen</a></p>
+<p class="muted">Vier unabhängige KIs. Ein gemeinsamer, nachvollziehbarer Forschungsstand.</p>
+<div class="banner"><strong>Lokaler Entwurf · Veröffentlichung durch GitHub-Commit</strong><br>Einträge werden nur in diesem Browser gespeichert. JSON-Exporte sind Sicherungskopien. Diese Datei bietet weder einen öffentlichen Server noch geschützte Online-Schreibzugriffe. Zum Veröffentlichen den JSON-Export im GitHub-Repository übernehmen. Die öffentliche Leseseite zeigt erst den dort veröffentlichten Stand.</div>
+<details class="card"><summary>Rollen und Umgang mit dem Protokoll</summary><p>ChatGPT: Koordinator · Grok: Forschung und Erfindungen · Gemini: Kreativität und Design · DeepSeek: Logik, Standards und Richtlinien.</p><p>Die KIs bleiben in ihren Apps. Beiträge werden manuell zugeordnet; ihre Herkunft ist nicht technisch verifiziert. Vollständige Texte einfügen. Nach dem Speichern können Einträge in dieser Oberfläche nicht bearbeitet oder gelöscht werden. Korrekturen als neuen Beitrag mit Bezug auf die alte ID ergänzen. Die lokale JSON-Datei ist technisch veränderbar und kein revisionssicheres Archiv.</p><p>Keine API-Schlüssel, Passwörter oder privaten Zugangsdaten eintragen. Vor einer späteren Veröffentlichung die Inhalte auf öffentliche Lesbarkeit prüfen.</p></details>
+<div class="stats"><span id="version"></span><span id="count"></span><span>Format 0.1.0</span></div>
+<p id="status" role="status" aria-live="polite"></p>
+<div class="grid"><aside>
+<section class="card"><h2>Beitrag manuell übernehmen</h2>
+<form id="entryForm"><label for="session">Sitzung</label><select id="session" required></select>
+<label for="author">KI-Autor</label><select id="author"><option>Grok</option><option>ChatGPT</option><option>Gemini</option><option>DeepSeek</option></select>
+<label for="kind">Eintragsart</label><select id="kind"><option value="message">Nachricht</option><option value="decision">Entscheidung</option><option value="research_state">Forschungsstand</option></select>
+<label for="sourceTime">Zeitpunkt der Quelle (optional)</label><input id="sourceTime" type="datetime-local"><small>Wird aus deiner lokalen Zeitzone in UTC übernommen. Zusätzlich wird der Übernahmezeitpunkt gespeichert.</small>
+<label for="content">Vollständiger Originaltext</label><textarea id="content" required placeholder="Hier die vollständige Nachricht aus der KI-App einfügen …"></textarea>
+<button id="saveEntry" type="submit">Unverändert lokal speichern</button></form></section>
+<section class="card"><h2>Sitzungen</h2><form id="sessionForm"><label for="sessionTitle">Neue Sitzung</label><input id="sessionTitle" required maxlength="180" placeholder="Thema der Forschung"><button class="secondary">Sitzung anlegen</button></form></section>
+<section class="card"><h2>JSON und Sicherung</h2><button id="exportAll">Vollständiges Protokoll exportieren</button><label for="viewExport">Weitere Ansicht exportieren</label><select id="viewExport"><option value="latest">Letzte 20 Nachrichten</option><option value="state">Aktueller Forschungsstand</option><option value="decisions">Gespeicherte Entscheidungen</option><option value="session">Ausgewählte Sitzung</option><option value="changes">Änderungen seit Version</option></select><label for="since">Seit Datenversion (exklusiv)</label><input id="since" type="number" min="0" step="1" value="0"><button id="exportView" class="secondary">Ansicht als JSON exportieren</button><hr><label for="importFile">Vollständiges Protokoll wiederherstellen</label><input id="importFile" type="file" accept="application/json,.json"><small>Nur in einen leeren lokalen Speicher möglich. Vorhandene Einträge werden nicht überschrieben. Ansichten sind keine vollständigen Sicherungen.</small></section>
+</aside><div>
+<section class="card"><h2>Aktueller Forschungsstand</h2><div id="stateView"></div></section>
+<section class="card"><h2>Gesprächsprotokoll</h2><label for="search">Suche in Text, ID und KI-Autor</label><input id="search" type="search" placeholder="Protokoll durchsuchen"><div class="row"><div><label for="sessionFilter">Sitzung filtern</label><select id="sessionFilter"></select></div><div><label for="kindFilter">Eintragsart filtern</label><select id="kindFilter"><option value="">Alle Einträge</option><option value="message">Nachrichten</option><option value="decision">Entscheidungen</option><option value="research_state">Forschungsstände</option></select></div></div><p class="muted">Chronologisch nach Übernahme, älteste zuerst. IDs folgen der Einfügereihenfolge.</p><div id="timeline"></div></section>
+<section class="card"><h2>Gespeicherte Entscheidungen</h2><div id="decisionsView"></div></section>
+</div></div>
+<footer>Prototyp 0.1.0 · <a href="https://www.rebootzombielabs.de/ki-kontroll-zentrum">Öffentliche Übersicht</a> · Exportdateien werden erst durch einen gesonderten Upload öffentlich.</footer>
+</main>
+<script>
+'use strict';
+const RZL = (() => {
+ const AUTHORS=['ChatGPT','Grok','Gemini','DeepSeek'];
+ const KINDS=['message','decision','research_state'];
+ const seed=()=>({schema_version:'0.1.0',project:'Reboot Zombie Labs',revision:0,created_at:new Date().toISOString(),sessions:[{id:'S0001',title:'Forschungsstart',created_at:new Date().toISOString(),created_revision:0}],entries:[],changes:[]});
+ const id=(prefix,n)=>prefix+String(n).padStart(6,'0');
+ function append(data,kind,payload,now=new Date().toISOString()){
+  const d=structuredClone(data), revision=d.revision+1;
+  if(kind==='session.created'){
+   if(!payload.title.trim())throw Error('Bitte einen Sitzungstitel eingeben.');
+   const s={id:'S'+String(d.sessions.length+1).padStart(4,'0'),title:payload.title,created_at:now,created_revision:revision};
+   d.sessions.push(s);d.changes.push({revision,type:kind,at:now,session:s});
+  }else{
+   if(!AUTHORS.includes(payload.author)||!KINDS.includes(payload.kind)||!d.sessions.some(s=>s.id===payload.session_id)||!payload.content.trim())throw Error('Autor, Sitzung, Eintragsart und Text sind erforderlich.');
+   const e={id:id('M',d.entries.length+1),session_id:payload.session_id,author:payload.author,kind:payload.kind,content:payload.content,source_timestamp:payload.source_timestamp||null,recorded_at:now,revision};
+   d.entries.push(e);d.changes.push({revision,type:'entry.appended',at:now,entry:e});
+  }d.revision=revision;return d;
+ }
+ function validate(d){
+  const fail=()=>{throw Error('Ungültige oder nicht unterstützte Protokolldatei. Erwartet wird ein vollständiger Export im Format 0.1.0.');};
+  const date=x=>typeof x==='string'&&Number.isFinite(Date.parse(x));
+  if(!d||d.schema_version!=='0.1.0'||d.project!=='Reboot Zombie Labs'||!Number.isSafeInteger(d.revision)||d.revision<0||!date(d.created_at)||!Array.isArray(d.sessions)||!d.sessions.length||!Array.isArray(d.entries)||!Array.isArray(d.changes)||d.changes.length!==d.revision)fail();
+  d.sessions.forEach((s,i)=>{if(s.id!=='S'+String(i+1).padStart(4,'0')||typeof s.title!=='string'||!s.title.trim()||!date(s.created_at)||!Number.isSafeInteger(s.created_revision)||s.created_revision<0||s.created_revision>d.revision||(i===0?s.created_revision!==0:s.created_revision===0))fail();});
+  d.entries.forEach((e,i)=>{if(e.id!==id('M',i+1)||!d.sessions.some(s=>s.id===e.session_id&&s.created_revision<e.revision)||!AUTHORS.includes(e.author)||!KINDS.includes(e.kind)||typeof e.content!=='string'||!e.content.trim()||!date(e.recorded_at)||(e.source_timestamp!==null&&!date(e.source_timestamp))||!Number.isSafeInteger(e.revision)||e.revision<1||e.revision>d.revision||(i&&e.revision<=d.entries[i-1].revision))fail();});
+  d.changes.forEach((c,i)=>{if(c.revision!==i+1||!date(c.at))fail();if(c.type==='entry.appended'){const e=d.entries.find(e=>e.revision===c.revision);if(!e||JSON.stringify(c.entry)!==JSON.stringify(e)||c.at!==e.recorded_at)fail();}else if(c.type==='session.created'){const s=d.sessions.find(s=>s.created_revision===c.revision);if(!s||JSON.stringify(c.session)!==JSON.stringify(s)||c.at!==s.created_at)fail();}else fail();});
+  if(d.entries.length+d.sessions.length-1!==d.revision)fail();
+  return d;
+ }
+ function view(d,scope,session,since){
+  const head={schema_version:d.schema_version,project:d.project,revision:d.revision,exported_at:new Date().toISOString(),scope};
+  if(scope==='latest')return {...head,messages:d.entries.filter(e=>e.kind==='message').slice(-20)};
+  if(scope==='state')return {...head,research_state:d.entries.filter(e=>e.kind==='research_state').at(-1)||null};
+  if(scope==='decisions')return {...head,decisions:d.entries.filter(e=>e.kind==='decision')};
+  if(scope==='session')return {...head,session:d.sessions.find(s=>s.id===session),entries:d.entries.filter(e=>e.session_id===session)};
+  if(scope==='changes'){if(!Number.isSafeInteger(since)||since<0||since>d.revision)throw Error('Die Ausgangsversion muss zwischen 0 und der aktuellen Datenversion liegen.');return {...head,from_revision:since,to_revision:d.revision,changes:d.changes.filter(c=>c.revision>since)};}
+  throw Error('Unbekannte Ansicht.');
+ }
+ return {seed,append,validate,view};
+})();
+if(typeof module!=='undefined')module.exports=RZL;
+if(typeof document!=='undefined'){
+ const $=s=>document.getElementById(s),KEY='rzl.research.protocol.v0.1.0';
+ let data,storageAvailable=true;
+ function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
+ try{const saved=localStorage.getItem(KEY);data=saved?RZL.validate(JSON.parse(saved)):RZL.seed();if(!saved)localStorage.setItem(KEY,JSON.stringify(data));}catch(e){storageAvailable=false;data=RZL.seed();status('Lokaler Speicher nicht verfügbar oder beschädigt. Keine neuen Einträge möglich. Vorhandene Browserdaten werden nicht überschrieben. '+e.message,true);}
+ function commit(next){
+  if(!storageAvailable)throw Error('Lokaler Speicher ist nicht verfügbar.');
+  if(localStorage.getItem(KEY)!==JSON.stringify(data))throw Error('Die Daten wurden in einem anderen Fenster geändert. Seite neu laden; der Text im Eingabefeld bleibt bis dahin erhalten.');
+  localStorage.setItem(KEY,JSON.stringify(next));data=next;render();
+ }
+ function option(value,text){const o=document.createElement('option');o.value=value;o.textContent=text;return o;}
+ function sessions(){for(const field of ['session','sessionFilter']){const el=$(field),value=el.value;el.replaceChildren();if(field==='sessionFilter')el.append(option('','Alle Sitzungen'));for(const s of data.sessions)el.append(option(s.id,s.id+' · '+s.title));if([...el.options].some(o=>o.value===value))el.value=value;}}
+ const labels={message:'Nachricht',decision:'Entscheidung',research_state:'Forschungsstand'};
+ function entry(e){const a=document.createElement('article');a.className='entry';a.dataset.author=e.author;const meta=document.createElement('div');meta.className='meta';meta.textContent=e.id+' · '+e.author+' · '+labels[e.kind]+' · '+e.session_id+' · Version '+e.revision;const time=document.createElement('div');time.className='meta';time.textContent='Übernommen: '+new Date(e.recorded_at).toLocaleString('de-DE')+(e.source_timestamp?' · Quelle: '+new Date(e.source_timestamp).toLocaleString('de-DE'):'');const content=document.createElement('pre');content.className='content';content.textContent=e.content;a.append(meta,time,content);return a;}
+ function list(el,entries,empty){el.replaceChildren();if(!entries.length){const p=document.createElement('p');p.className='muted';p.textContent=empty;el.append(p);}else entries.forEach(e=>el.append(entry(e)));}
+ function render(){sessions();$('version').textContent='Datenversion '+String(data.revision).padStart(3,'0');$('count').textContent=data.entries.length+' Einträge · '+data.sessions.length+' Sitzungen';const q=$('search').value.toLocaleLowerCase('de-DE'),s=$('sessionFilter').value,k=$('kindFilter').value;list($('timeline'),data.entries.filter(e=>(!s||e.session_id===s)&&(!k||e.kind===k)&&[e.content,e.id,e.author].some(x=>x.toLocaleLowerCase('de-DE').includes(q))),'Keine passenden Einträge.');list($('stateView'),data.entries.filter(e=>e.kind==='research_state').slice(-1),'Noch kein Forschungsstand dokumentiert.');list($('decisionsView'),data.entries.filter(e=>e.kind==='decision'),'Noch keine Entscheidungen dokumentiert.');$('saveEntry').disabled=!storageAvailable;}
+ function download(obj,name){const url=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)+'\n'],{type:'application/json;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status('JSON-Export erstellt. Die Datei wurde nicht veröffentlicht.');}
+ $('entryForm').addEventListener('submit',e=>{e.preventDefault();try{const source=$('sourceTime').value;commit(RZL.append(data,'entry.appended',{session_id:$('session').value,author:$('author').value,kind:$('kind').value,content:$('content').value,source_timestamp:source?new Date(source).toISOString():null}));$('content').value='';$('sourceTime').value='';status('Eintrag '+data.entries.at(-1).id+' lokal gespeichert. Bitte das vollständige Protokoll als Sicherung exportieren.');}catch(err){status(err.message,true);}});
+ $('sessionForm').addEventListener('submit',e=>{e.preventDefault();try{commit(RZL.append(data,'session.created',{title:$('sessionTitle').value}));$('session').value=data.sessions.at(-1).id;$('sessionTitle').value='';status('Sitzung angelegt.');}catch(err){status(err.message,true);}});
+ for(const field of ['search','sessionFilter','kindFilter'])$(field).addEventListener('input',render);
+ $('exportAll').onclick=()=>download(data,'protokoll.json');
+ $('exportView').onclick=()=>{try{const scope=$('viewExport').value;download(RZL.view(data,scope,$('session').value,Number($('since').value)),'rzl-'+scope+'-v'+data.revision+'.json');}catch(err){status(err.message,true);}};
+ $('importFile').onchange=async()=>{try{const f=$('importFile').files[0];if(!f)return;if(data.revision!==0)throw Error('Wiederherstellung ist nur in einem leeren Prototyp möglich. Zuerst das aktuelle Protokoll sichern und einen separaten Browser-Speicher verwenden.');if(f.size>20000000)throw Error('Die Datei ist zu groß für diesen lokalen Prototyp (maximal 20 MB).');const restored=RZL.validate(JSON.parse(await f.text()));commit(restored);status('Vollständiges Protokoll wiederhergestellt.');}catch(err){status(err.message,true);}finally{$('importFile').value='';}};
+ window.addEventListener('storage',e=>{if(e.key===KEY){storageAvailable=false;$('saveEntry').disabled=true;status('Das Protokoll wurde in einem anderen Fenster geändert. Vor dem nächsten Speichern neu laden; einen ungespeicherten Entwurf vorher kopieren.',true);}});
+ render();
+}
+</script></html>
