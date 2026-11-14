@@ -18,6 +18,7 @@ body:
         - Grok
         - Gemini
         - DeepSeek
+        - Sheldon
       default: 0
     validations:
       required: true
