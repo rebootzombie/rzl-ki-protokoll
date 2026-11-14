@@ -13,10 +13,14 @@ function publish(input){
  }
  if(d.revision<1)throw Error('Die erste Veröffentlichung beginnt bei Version 001.');
  d.protocol_version=String(d.revision).padStart(3,'0');d.published_at=new Date().toISOString();
- const write=(relative,value,exclusive=false)=>{const target=path.join(root,relative);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(value,null,2)+'\n',exclusive?{flag:'wx'}:undefined);};
  // Archive before changing the current public file. Existing version files are never overwritten.
  write('versionen/protokoll-'+d.protocol_version+'.json',d,true);
  write('protokoll.json',d);
+ buildViews(d);
+ return d;
+}
+const write=(relative,value,exclusive=false)=>{const target=path.join(root,relative);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,JSON.stringify(value)+'\n',exclusive?{flag:'wx'}:undefined);};
+function buildViews(d){
  const head={schema_version:d.schema_version,protocol_version:d.protocol_version,revision:d.revision,published_at:d.published_at};
  write('stand.json',{...head,research_state:d.entries.filter(e=>e.kind==='research_state').at(-1)||null});
  write('nachrichten.json',{...head,messages:d.entries.filter(e=>e.kind==='message').slice(-20)});
@@ -26,7 +30,10 @@ function publish(input){
  const since=[];
  for(let n=0;n<=d.revision;n++){const file='aenderungen/seit-'+String(n).padStart(3,'0')+'.json';write(file,{...head,from_revision:n,to_revision:d.revision,changes:d.changes.filter(c=>c.revision>n)});since.push({from_revision:n,url:file});}
  write('aenderungen.json',{...head,changes:d.changes,since,versions:fs.readdirSync(path.join(root,'versionen')).filter(n=>/^protokoll-\d+\.json$/.test(n)).sort().map(n=>({url:'versionen/'+n}))});
- return d;
+ for(const entry of d.entries)write('nachrichten/'+entry.id+'.json',{...head,entry});
+ const metadata=e=>({id:e.id,author:e.author,kind:e.kind,session_id:e.session_id,revision:e.revision,recorded_at:e.recorded_at,url:'nachrichten/'+e.id+'.json'});
+ write('kurz.json',{...head,entry_count:d.entries.length,latest:d.entries.slice(-10).map(metadata),research_state:d.entries.filter(e=>e.kind==='research_state').slice(-1).map(metadata),decisions:d.entries.filter(e=>e.kind==='decision').slice(-10).map(metadata),sessions:d.sessions});
+ write('manifest.json',{...head,project:d.project,entry_count:d.entries.length,session_count:d.sessions.length,urls:{overview:'kurz.json',full:'protokoll.json',latest:'nachrichten.json',research_state:'stand.json',decisions:'entscheidungen.json',sessions:'sitzungen.json',changes:'aenderungen.json',changes_since_template:'aenderungen/seit-{version:000}.json',message_template:'nachrichten/{id}.json',version_template:'versionen/protokoll-{version:000}.json'}});
 }
 if(require.main===module){const input=process.argv[2];if(!input)throw Error('Aufruf: node pages-publication.cjs exportiertes-protokoll.json');const d=publish(JSON.parse(fs.readFileSync(path.resolve(input),'utf8')));console.log('Version '+d.protocol_version+' für manuellen GitHub-Commit vorbereitet.');}
-module.exports={publish,RZL,root};
+module.exports={publish,buildViews,RZL,root};

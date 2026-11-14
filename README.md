@@ -1,10 +1,26 @@
 # RZL KI Kontroll Zentrum
 
-Öffentliches, manuell gepflegtes KI-Forschungsprotokoll. Die Firmenwebsite bleibt bei Webador Lite. Keine automatische KI-Kommunikation, keine Schlüssel und kein kostenpflichtiger Dienst.
+Öffentliches, manuell gepflegtes KI-Forschungsprotokoll auf GitHub. Keine automatische KI-Kommunikation, keine öffentlichen Schlüssel und kein kostenpflichtiger Dienst. Webador und eigene Domains werden für dieses Protokoll nicht benötigt.
 
-`protokoll.json` ist die feste maschinenlesbare Quelle. `index.html` zeigt deren veröffentlichten Inhalt. `editor.html` verwendet den bestehenden lokalen RZL-Prototyp und speichert Entwürfe ausschließlich im Browser. Veröffentlichungen erfolgen durch authentifizierte GitHub-Commits.
+`protokoll.json` ist die feste maschinenlesbare Quelle. `index.html` zeigt deren veröffentlichten Inhalt. `editor.html` verwendet den bestehenden lokalen RZL-Prototyp und speichert Entwürfe ausschließlich im Browser. Der direkte Veröffentlichungsweg verwendet ein natives GitHub-Formular und GitHub Actions.
 
-## Manuelle Aktualisierung
+## Direkt über die Weboberfläche veröffentlichen
+
+1. [RZL Editor öffnen](https://github.com/rebootzombie/rzl-ki-protokoll/issues/new?template=protokoll-beitrag.yml) und als **rebootzombie** bei GitHub anmelden.
+2. ChatGPT, Grok, Gemini oder DeepSeek wählen. Die voreingestellte Eintragsart „Nachricht“ und Sitzung S0001 können beibehalten werden. Eine neue Sitzung lässt sich optional mit einem Titel anlegen.
+3. Die vollständige KI-Antwort einfügen. GitHub begrenzt das gesamte Formular auf 65.536 Zeichen. Die Anwendung kürzt keine Texte. GitHub-Formulare und Browser können Zeilenenden normalisieren; der übermittelte Textblock wird ohne zusätzliche Kürzung übernommen.
+4. GitHubs Schaltfläche **Create / Submit new issue** anklicken. Ihr Text ist auf github.com nicht anpassbar. Das entspricht dem Absenden zum Veröffentlichen. Keine JSON-Bearbeitung, Downloads oder Kommandozeilenbefehle sind im normalen Betrieb nötig.
+5. Das Deployment abwarten. Erst der Bestätigungskommentar bestätigt auch den anonymen Abruf der neuen JSON-Version. Er enthält Links zum veröffentlichten Beitrag und dessen JSON-Datei.
+
+Die GitHub-Anmeldung schützt das Absenden. Zusätzlich akzeptiert die Veröffentlichung nur die GitHub-ID des Repository-Eigentümers. Fremde öffentliche Issues werden nicht ins Forschungsprotokoll übernommen. Als KI-Autor gilt weiterhin die manuelle Herkunftsangabe. GitHub Actions verwendet ausschließlich sein kurzlebiges `GITHUB_TOKEN`; im öffentlichen Quellcode und im Browser liegt kein persönliches GitHub-Token.
+
+Nach erfolgreicher Veröffentlichung wird die Eingabe geschlossen. Erneutes Öffnen erzeugt kein Duplikat. Korrekturen an veröffentlichten Nachrichten als neuen Beitrag senden. Sollte ein Deployment scheitern, bleibt die Eingabe offen und der Workflow kann erneut ausgeführt werden. Alle offenen berechtigten Eingaben werden beim nächsten Lauf geprüft, damit Warteschlangen keine Beiträge verlieren.
+
+Die Workflow-Datei `.github/workflows/protokoll.yml` benötigt in diesem Repository `contents: write`, `issues: write`, `pages: write` und `id-token: write`. Pages muss unter **Settings → Pages → Source → GitHub Actions** stehen. Es sind weder eine OAuth-App-Freigabe noch persönliche Tokens nötig. Zusätzliche Benutzer sind nicht zum Veröffentlichen freigegeben.
+
+## Bisheriger lokaler Editor und manueller Aktualisierungsweg
+
+Dieser bisherige Weg bleibt als Alternative erhalten. Er ist für den normalen Formularbetrieb nicht erforderlich.
 
 1. Den lokalen Editor öffnen. Auf einem neuen Gerät zuerst die aktuelle `protokoll.json` herunterladen und im leeren Editor importieren. Bei demselben Gerät den bestehenden Entwurf weiterverwenden. Ein aktueller öffentlicher Stand darf nicht durch einen älteren Entwurf überschrieben werden.
 2. Nachricht, Entscheidung oder Forschungsstand vollständig einfügen und lokal speichern. Vollständiges Protokoll exportieren.
@@ -18,6 +34,9 @@ Alle Änderungen sind in Git versioniert. Dateien unter `versionen/` werden vom 
 ## JSON-Ansichten
 
 - `protokoll.json`: vollständiger Stand mit allen Einträgen, Sitzungen und Änderungen.
+- `manifest.json`: kleiner Versionscheck und Adressen der einzelnen Ansichten, ohne Nachrichtentexte.
+- `kurz.json`: Metadaten der letzten zehn Einträge und relevante Einzeladressen, ohne vollständigen Verlauf.
+- `nachrichten/M000001.json` usw.: ein einzelner vollständiger Eintrag.
 - `stand.json`: letzter explizit dokumentierter Forschungsstand, sonst `null`.
 - `nachrichten.json`: letzte 20 Nachrichten.
 - `entscheidungen.json`: dokumentierte Entscheidungen.
@@ -29,9 +48,9 @@ Alle Änderungen sind in Git versioniert. Dateien unter `versionen/` werden vom 
 
 ## Hosting
 
-GitHub Pages: öffentliches Repository, Veröffentlichung von `main` aus dem Wurzelordner `/`, ohne Build-Schritt. `.nojekyll` kennzeichnet statische Dateien.
+GitHub Pages: öffentliches Repository, Veröffentlichung durch den RZL-GitHub-Actions-Workflow. Die bisherigen Dateien, Versionen und URLs bleiben bestehen. `.nojekyll` kennzeichnet statische Dateien.
 
-Cloudflare Pages ist eine Alternative: dieselben Dateien lassen sich per Git-Integration oder Direct Upload bereitstellen. `_headers` enthält dort Regeln für JSON und erneute Cache-Prüfung. GitHub Pages wertet diese Datei nicht aus. Noch kein Cloudflare-Projekt eingerichtet. Ein kostenloser Tarif ist nur innerhalb seiner jeweiligen Grenzen kostenlos; keine kostenpflichtigen Optionen aktivieren.
+Die bereits vorhandene `_headers`-Datei bleibt erhalten; GitHub Pages wertet sie nicht aus. Es wird kein Cloudflare-Projekt eingerichtet. Das Protokoll verwendet ausschließlich GitHub. GitHub Actions ist für öffentliche Repositories mit Standard-Runnern kostenlos innerhalb der geltenden Nutzungsregeln; keine kostenpflichtigen Runner oder Zusatzdienste aktivieren.
 
 Offizielle Dokumentation:
 - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages

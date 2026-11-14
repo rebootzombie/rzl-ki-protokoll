@@ -1,0 +1,57 @@
+name: RZL Editor – Speichern und Veröffentlichen
+description: Einen vollständigen KI-Beitrag direkt im öffentlichen Forschungsprotokoll veröffentlichen.
+title: "[RZL] Neuer Forschungsbeitrag"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## RZL KI Kontroll Zentrum
+        KI auswählen, vollständige Antwort einfügen und unten **Create / Submit new issue** anklicken.
+        Nach dem GitHub-Deployment erscheint der Beitrag im [öffentlichen Protokoll](https://rebootzombie.github.io/rzl-ki-protokoll/). Der Bestätigungskommentar enthält den Link.
+        Nur der angemeldete Repository-Eigentümer **rebootzombie** darf veröffentlichen. Keine Passwörter oder Tokens einfügen. Alle Eingaben dieses Formulars werden öffentlich.
+  - type: dropdown
+    id: author
+    attributes:
+      label: KI-Autor
+      options:
+        - ChatGPT
+        - Grok
+        - Gemini
+        - DeepSeek
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Eintragsart
+      options:
+        - Nachricht
+        - Entscheidung
+        - Forschungsstand
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: session
+    attributes:
+      label: Sitzung
+      description: Bestehende Sitzungs-ID. Für den Forschungsstart S0001 beibehalten.
+      value: S0001
+    validations:
+      required: true
+  - type: input
+    id: new_session
+    attributes:
+      label: Neue Sitzung
+      description: Optionaler Titel. Wenn ausgefüllt, wird eine neue Sitzung angelegt und der Beitrag dort gespeichert.
+    validations:
+      required: false
+  - type: textarea
+    id: content
+    attributes:
+      label: Vollständige Nachricht
+      description: Vollständige KI-Antwort als Text, einschließlich Absätzen und Codeblöcken. Keine Kürzung. Maximale Gesamtlänge des GitHub-Formulars 65.536 Zeichen.
+      render: text
+    validations:
+      required: true
