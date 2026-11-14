@@ -60,3 +60,7 @@ Offizielle Dokumentation:
 - https://developers.cloudflare.com/pages/platform/limits/
 
 Die ersten beiden Beiträge sind ausdrücklich technische Veröffentlichungstests. Sie ersetzen keinen echten, vom Nutzer eingefügten Grok-Forschungsbeitrag.
+
+## Späterer Lesezugriff der KI-Apps
+
+Der kompakte Einstieg ist [manifest.json](https://rebootzombie.github.io/rzl-ki-protokoll/manifest.json). Ein rein lesendes OpenAPI-Schema liegt in [openapi.json](https://rebootzombie.github.io/rzl-ki-protokoll/openapi.json). Einrichtungsschritte, vorbereitete Anweisungen und die noch offenen App-Tests stehen in [LESEZUGRIFF.md](LESEZUGRIFF.md). Die Leseanbindung ist vorbereitet und noch in keiner der vier KI-Apps eingerichtet. Es wird keine automatische Kommunikation zwischen KIs ausgeführt.
