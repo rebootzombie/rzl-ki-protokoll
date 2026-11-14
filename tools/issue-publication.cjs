@@ -5,13 +5,13 @@ const KINDS={Nachricht:'message',Entscheidung:'decision',Forschungsstand:'resear
 function parseIssue(body){
  if(typeof body!=='string')throw Error('Nachrichtentext fehlt.');
  body=body.replace(/\r\n/g,'\n');
- const marker='### Vollständige Nachricht\n\n```text\n';
+ const marker='### Vollständige Nachricht\n\nRZL_ORIGINAL_BEGIN\n';
  const start=body.indexOf(marker);
- if(start<0)throw Error('Bitte das RZL-Formular verwenden.');
+ if(start<0)throw Error('Bitte die Nachricht zwischen den beiden RZL-Markierungszeilen im aktuellen Formular einfügen.');
  const prefix=body.slice(0,start),tail=body.slice(start+marker.length);
- // Only the form's final closing fence is removed. Inner fences and headings stay part of the original text.
- const end=tail.lastIndexOf('\n```');
- if(end<0||tail.slice(end+4).trim()!=='')throw Error('Das Nachrichtenfeld hat keinen vollständigen Textblock.');
+ // Sentinels prevent GitHub's field trimming. No render:text wrapper: GitHub removes inner code fences in that mode.
+ const closing='\nRZL_ORIGINAL_END',end=tail.lastIndexOf(closing);
+ if(end<0||tail.slice(end+closing.length).trim()!=='')throw Error('Die abschließende RZL-Markierungszeile fehlt. Nichts wurde gekürzt.');
  const content=tail.slice(0,end);
  const field=name=>{const marker='### '+name+'\n\n';const at=prefix.indexOf(marker);if(at<0||at!==prefix.lastIndexOf(marker))throw Error('Ungültige Formularfelder.');const rest=prefix.slice(at+marker.length);return rest.split('\n\n### ')[0].trim();};
  const author=field('KI-Autor'),kind=KINDS[field('Eintragsart')],session=field('Sitzung');

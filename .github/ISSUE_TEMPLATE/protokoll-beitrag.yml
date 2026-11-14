@@ -51,7 +51,10 @@ body:
     id: content
     attributes:
       label: Vollständige Nachricht
-      description: Vollständige KI-Antwort als Text, einschließlich Absätzen und Codeblöcken. Keine Kürzung. Maximale Gesamtlänge des GitHub-Formulars 65.536 Zeichen.
-      render: text
+      description: Die vollständige Antwort in die Leerzeile ZWISCHEN den beiden RZL-Markierungen einfügen. Markierungszeilen stehenlassen. So bleiben auch Codeblöcke und äußere Leerzeichen erhalten. Gesamtes Formular maximal 65.536 Zeichen.
+      value: |
+        RZL_ORIGINAL_BEGIN
+
+        RZL_ORIGINAL_END
     validations:
       required: true

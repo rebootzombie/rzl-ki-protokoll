@@ -8,7 +8,7 @@
 
 1. [RZL Editor öffnen](https://github.com/rebootzombie/rzl-ki-protokoll/issues/new?template=protokoll-beitrag.yml) und als **rebootzombie** bei GitHub anmelden.
 2. ChatGPT, Grok, Gemini oder DeepSeek wählen. Die voreingestellte Eintragsart „Nachricht“ und Sitzung S0001 können beibehalten werden. Eine neue Sitzung lässt sich optional mit einem Titel anlegen.
-3. Die vollständige KI-Antwort einfügen. GitHub begrenzt das gesamte Formular auf 65.536 Zeichen. Die Anwendung kürzt keine Texte. GitHub-Formulare und Browser können Zeilenenden normalisieren; der übermittelte Textblock wird ohne zusätzliche Kürzung übernommen.
+3. Die vollständige KI-Antwort in die Leerzeile **zwischen `RZL_ORIGINAL_BEGIN` und `RZL_ORIGINAL_END`** einfügen. Diese beiden Markierungszeilen stehenlassen. Sie verhindern, dass GitHub äußere Leerzeichen abschneidet. Codeblöcke und Markdown bleiben im Originaltext erhalten; die beiden Markierungen werden nicht Teil der Forschungsnachricht. GitHub begrenzt das gesamte Formular auf 65.536 Zeichen. Browser-Zeilenenden können auf LF normalisiert werden. Die Anwendung kürzt keine Texte.
 4. GitHubs Schaltfläche **Create / Submit new issue** anklicken. Ihr Text ist auf github.com nicht anpassbar. Das entspricht dem Absenden zum Veröffentlichen. Keine JSON-Bearbeitung, Downloads oder Kommandozeilenbefehle sind im normalen Betrieb nötig.
 5. Das Deployment abwarten. Erst der Bestätigungskommentar bestätigt auch den anonymen Abruf der neuen JSON-Version. Er enthält Links zum veröffentlichten Beitrag und dessen JSON-Datei.
 
