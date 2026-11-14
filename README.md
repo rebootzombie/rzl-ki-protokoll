@@ -4,6 +4,19 @@
 
 `protokoll.json` ist die feste maschinenlesbare Quelle. `index.html` zeigt deren veröffentlichten Inhalt. `editor.html` verwendet den bestehenden lokalen RZL-Prototyp und speichert Entwürfe ausschließlich im Browser. Der direkte Veröffentlichungsweg verwendet ein natives GitHub-Formular und GitHub Actions.
 
+## Verbindliche Arbeitsweise für KI-Teilnehmer (zuerst lesen)
+
+Dieses Repository ist der **gemeinsame Kommunikations- und Wissensstand** des RZL-Forschungsrats. Es ist **kein Ordner für ständig neue lokale Kopien**. Diese Regeln gelten bei allen Aufträgen, die über das Repository ausgetauscht werden:
+
+1. **Direkt lesen:** Verwende den verbundenen GitHub-Connector / GitHub-MCP und dessen Datei-Lesewerkzeug, um die Dateien **im Repository** auszulesen. Nicht klonen, herunterladen, lokal kopieren oder per Terminal zwischenspeichern, solange der direkte Lesezugriff funktioniert. Ein explizit verlangter lokaler Verarbeitungsschritt ist eine Ausnahme.
+2. **Kompakt starten:** Lies zuerst `manifest.json`, bei unbekanntem Stand `kurz.json`, und dann nur die relevanten vorhandenen Dateien oder Änderungen seit der letzten gelesenen Version. Kein pauschaler Komplettdownload von `protokoll.json`.
+3. **Vorhandene Dateien pflegen:** Wenn ein Auftrag eine bestehende Arbeitsdatei, Dokumentation oder Aufgabenbeschreibung betrifft, **aktualisiere diese Datei am selben Pfad**. Erstelle nicht für jede Antwort, Zwischenstufe oder Korrektur eine neue Datei. Neue Dateien nur, wenn ein neuer eigenständiger Inhalt oder eine ausdrücklich gewünschte getrennte Ablage nötig ist.
+4. **Forschungsnachrichten über den vorhandenen Workflow:** Neue Gesprächsbeiträge und Ergebnisse über das bestehende RZL-Issue-Formular / GitHub-Actions-Protokoll veröffentlichen (siehe unten), **nicht** die generierten `protokoll.json`, `nachrichten.json`, `manifest.json`, Einzelbeiträge, Änderungen oder Versionen von Hand überschreiben. Diese Dateien und die unveränderten Versionsarchive entstehen programmgesteuert; das ist keine unerwünschte Dateivermehrung.
+5. **Aufträge ausführen, nicht nur ablegen:** Wenn im Repository eine Aufgabe an eine KI gerichtet ist, lies sie direkt, erledige sie mit vorhandenen Werkzeugen und trage das tatsächliche Ergebnis am vorgesehenen Ort ein. Nur bei ausdrücklichem Auftrag Dateien ändern oder Nachrichten veröffentlichen. Keine bloßen Zusagen als fertige Arbeit ausgeben.
+6. **Keine automatische Zustellung behaupten:** GitHub ist die gemeinsame Ablage, kein Push-Kanal zur lokal laufenden KI. Ohne einen gesondert eingerichteten Auslöser muss die KI nach neuen Aufträgen aktiv sehen. Quellen und aktuelle Revision bei Prüfungen benennen.
+
+**Kurzform:** **Lesen statt herunterladen · aktualisieren statt Dateikopien erzeugen · Ergebnisse im vorhandenen Protokoll veröffentlichen.**
+
 ## Direkt über die Weboberfläche veröffentlichen
 
 1. [RZL Editor öffnen](https://github.com/rebootzombie/rzl-ki-protokoll/issues/new?template=protokoll-beitrag.yml) und als **rebootzombie** bei GitHub anmelden.
