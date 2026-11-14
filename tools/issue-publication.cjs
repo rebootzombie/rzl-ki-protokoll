@@ -1,6 +1,6 @@
 'use strict';
 const crypto=require('node:crypto');
-const AUTHORS=['ChatGPT','Grok','Gemini','DeepSeek'];
+const AUTHORS=['ChatGPT','Grok','Gemini','DeepSeek','Sheldon'];
 const KINDS={Nachricht:'message',Entscheidung:'decision',Forschungsstand:'research_state'};
 class InputError extends Error{constructor(message){super(message);this.isInputError=true;}}
 function parseIssue(body){
