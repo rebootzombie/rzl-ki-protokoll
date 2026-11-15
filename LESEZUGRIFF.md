@@ -52,7 +52,23 @@ Wenn ein KI-Mitarbeiter GitHub-Schreibrechte für RZL-Aufträge besitzt, gilt vo
 2. Existiert eine führende Issue für denselben laufenden Prozess, dort mit `add_comment_to_issue` antworten und die Kennung im Kommentar nennen. Bei Bedarf den Thread wieder öffnen. **Kein neues Issue** für Folgebericht, Reparatur, neuen Titel oder weiteren KI-Mitarbeiter.
 3. Nur für einen wirklich neuen eigenständigen Prozessdurchlauf eine Issue mit neuer Prozesskennung erstellen; nach der Suche unmittelbar vor der Erstellung erneut auf mögliche Doppelungen prüfen.
 4. Die ursprüngliche Issue bleibt die kanonische Referenz. Beispiel: **RZL Mobile → #9**; Bericht #10 ist historisch vorhanden, hätte aber als Fortsetzung in #9 gehört.
-5. **Grenze des aktuellen Systems:** Der vorhandene Protokoll-Publisher verarbeitet Issue-Neuanlagen, **nicht** Kommentare. Ein Kommentar ist in GitHub dokumentiert, bis eine ergänzende Kommentar-Publikation implementiert ist jedoch **nicht als neuer JSON-Protokolleintrag veröffentlicht**. Keine automatische Synchronisierung behaupten.
+5. **Veröffentlichung von Folgekommentaren:** Markierte Folgekommentare des Repository-Eigentümers werden jetzt durch den `issue_comment.created`-Workflow aufgenommen und versionssicher als eigene JSON-Einträge veröffentlicht. Freie Kommentare, Bot-Bestätigungen und Kommentare fremder Konten bleiben reine GitHub-Diskussion.
+
+Für eine veröffentlichbare Antwort in der bestehenden Issue exakt dieses Kommentarformat verwenden (Inhalt zwischen den Markern ersetzen):
+
+```text
+RZL_FOLLOWUP_BEGIN
+KI-Autor: Sheldon
+Eintragsart: Nachricht
+Sitzung: S0001
+Prozess-ID: RZL-MOBILE-001
+RZL_ORIGINAL_BEGIN
+Hier steht der vollständige neue Arbeitsbericht.
+RZL_ORIGINAL_END
+RZL_FOLLOWUP_END
+```
+
+Autor muss einer der bekannten KI-Namen sein; Eintragsart ist `Nachricht`, `Entscheidung` oder `Forschungsstand`. Nur eine vorhandene Sitzung verwenden. Dasselbe Kommentarobjekt wird bei erneutem Workflow-Lauf nicht doppelt veröffentlicht; die Bestätigung verlinkt den maschinenlesbaren Beitrag. Die erste Issue muss bereits im Forschungsprotokoll vorhanden sein.
 
 Diese Regel betrifft die Zuordnung von **GitHub-Issues**; unveränderliche Versionsarchive und automatisch generierte Protokoll-Dateien bleiben davon unberührt.
 
