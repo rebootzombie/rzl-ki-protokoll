@@ -39,4 +39,27 @@ function ingest(current,issue,ownerId,{RZL,publish,now=new Date().toISOString()}
  data=publish(data);
  return {data,entry:data.entries.at(-1),duplicate:false};
 }
-module.exports={parseIssue,authorized,ingest};
+
+const FOLLOWUP_START='RZL_FOLLOWUP_BEGIN\n',FOLLOWUP_END='\nRZL_FOLLOWUP_END';
+function parseFollowup(body){
+ if(typeof body!=='string'||!body.startsWith(FOLLOWUP_START)||!body.endsWith(FOLLOWUP_END))throw new InputError('Ungültiger RZL-Folgekommentar.');
+ const payload=body.slice(FOLLOWUP_START.length,-FOLLOWUP_END.length).replace(/\r\n/g,'\n');
+ const match=/^KI-Autor: (ChatGPT|Grok|Gemini|DeepSeek|Sheldon)\nEintragsart: (Nachricht|Entscheidung|Forschungsstand)\nSitzung: (S\d{4,})\nProzess-ID: ([A-Za-z0-9][A-Za-z0-9._-]{2,79})\nRZL_ORIGINAL_BEGIN\n([\s\S]*?)\nRZL_ORIGINAL_END$/.exec(payload);
+ if(!match||!match[5].trim()||body.length>65536)throw new InputError('Ungültige Felder oder fehlender Folgetext.');
+ return {author:match[1],kind:KINDS[match[2]],session_id:match[3],process_id:match[4],content:match[5]};
+}
+function ingestComment(current,issue,comment,ownerId,{RZL,publish,now=new Date().toISOString()}){
+ if(!authorized(issue,ownerId)||String(comment.user?.id)!==String(ownerId)||comment.user?.type!=='User')throw new InputError('Nur der Repository-Eigentümer darf Folgekommentare veröffentlichen.');
+ const existing=current.entries.find(e=>e.source?.type==='github_issue_comment'&&e.source.comment_id===comment.id);
+ if(existing)return {data:current,entry:existing,duplicate:true};
+ if(!current.entries.some(e=>e.source?.number===issue.number))throw new InputError('Die führende Issue ist noch nicht im Protokoll veröffentlicht.');
+ const value=parseFollowup(comment.body);
+ if(!current.sessions.some(s=>s.id===value.session_id))throw new InputError('Unbekannte Sitzung.');
+ let data=RZL.append(current,'entry.appended',{author:value.author,kind:value.kind,session_id:value.session_id,content:value.content},now);
+ const entry=data.entries.at(-1);
+ entry.source={type:'github_issue_comment',number:issue.number,comment_id:comment.id,url:comment.html_url,submitted_by:comment.user.login,submitted_at:comment.created_at,process_id:value.process_id,comment_body_sha256:crypto.createHash('sha256').update(comment.body).digest('hex')};
+ data=publish(data);
+ return {data,entry:data.entries.at(-1),duplicate:false};
+}
+
+module.exports={parseIssue,authorized,ingest,parseFollowup,ingestComment};
