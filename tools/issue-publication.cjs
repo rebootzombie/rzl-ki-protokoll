@@ -42,8 +42,10 @@ function ingest(current,issue,ownerId,{RZL,publish,now=new Date().toISOString()}
 
 const FOLLOWUP_START='RZL_FOLLOWUP_BEGIN\n',FOLLOWUP_END='\nRZL_FOLLOWUP_END';
 function parseFollowup(body){
- if(typeof body!=='string'||!body.startsWith(FOLLOWUP_START)||!body.endsWith(FOLLOWUP_END))throw new InputError('Ungültiger RZL-Folgekommentar.');
- const payload=body.slice(FOLLOWUP_START.length,-FOLLOWUP_END.length).replace(/\r\n/g,'\n');
+ if(typeof body!=='string')throw new InputError('Ungültiger RZL-Folgekommentar.');
+ body=body.replace(/\r\n/g,'\n');
+ if(!body.startsWith(FOLLOWUP_START)||!body.endsWith(FOLLOWUP_END))throw new InputError('Ungültige RZL-Folgekommentar-Markierungen.');
+ const payload=body.slice(FOLLOWUP_START.length,-FOLLOWUP_END.length);
  const match=/^KI-Autor: (ChatGPT|Grok|Gemini|DeepSeek|Sheldon)\nEintragsart: (Nachricht|Entscheidung|Forschungsstand)\nSitzung: (S\d{4,})\nProzess-ID: ([A-Za-z0-9][A-Za-z0-9._-]{2,79})\nRZL_ORIGINAL_BEGIN\n([\s\S]*?)\nRZL_ORIGINAL_END$/.exec(payload);
  if(!match||!match[5].trim()||body.length>65536)throw new InputError('Ungültige Felder oder fehlender Folgetext.');
  return {author:match[1],kind:KINDS[match[2]],session_id:match[3],process_id:match[4],content:match[5]};
