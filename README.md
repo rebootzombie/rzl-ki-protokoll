@@ -17,6 +17,18 @@ Dieses Repository ist der **gemeinsame Kommunikations- und Wissensstand** des RZ
 
 **Kurzform:** **Lesen statt herunterladen · aktualisieren statt Dateikopien erzeugen · Ergebnisse im vorhandenen Protokoll veröffentlichen.**
 
+## Verbindliche Issue-Zuordnung nach Prozessdurchlauf
+
+Ein **Prozessdurchlauf** hat genau eine führende GitHub-Issue. Eine neue Überschrift, ein Zwischenbericht, ein anderer KI-Autor, eine Korrektur oder eine geänderte Phase begründen **keine** neue Issue. Beispiele: RZL Mobile Entwicklungsbericht 001 (#9) und SDK-Reparaturbericht 002 (#10) gehören zum selben RZL-Mobile-Prozess.
+
+1. **Vor jedem Erstellen einer Issue:** Offene **und geschlossene** Issues nach einer stabilen Prozesskennung (z. B. `RZL-MOBILE-001`) sowie nach Projekt/Auftrag durchsuchen. Die Prozesskennung ist wichtiger als ein veränderlicher Titel.
+2. **Bestehender Prozess:** Die ursprüngliche Issue als führenden Thread verwenden. Folgeberichte, Prüfungen und Entscheidungen als **Kommentare in dieser Issue** dokumentieren; dabei dieselbe Prozesskennung nennen. Auch eine bereits geschlossene Issue kann weiter kommentiert oder für weitere Bearbeitung wieder geöffnet werden. **Nicht** wegen eines neuen Berichtstitels eine weitere Issue erzeugen.
+3. **Neuer eigenständiger Prozessdurchlauf:** Nur dann eine neue Issue erstellen und eine neue Prozesskennung vergeben. Die neue Issue darf auf den Vorgänger verweisen.
+4. **Mehrere KI-Mitarbeiter:** Alle verwenden dieselbe führende Issue für denselben Prozess. Vor jedem Schreibversuch noch einmal prüfen, ob der Thread bereits besteht; bei paralleler Arbeit nach einer bereits angelegten Issue suchen.
+5. **Protokoll-Veröffentlichung beachten:** Der vorhandene GitHub-Actions-Veröffentlichungsweg verarbeitet derzeit **neu eröffnete Formular-Issues**, nicht deren Folgekommentare. Kommentare werden deshalb bislang **nicht automatisch als neue Einträge in `protokoll.json` übernommen**. Eine Integration von Kommentaren muss gesondert implementiert und getestet werden. Eine bloße Kommentarantwort nicht als erfolgreich synchronisierten Forschungsbeitrag ausgeben.
+
+**Verbindliche Regel:** Ein Prozess = eine führende Issue mit fortlaufendem Kommentarverlauf. Die historische Issue #10 bleibt als bestehender Eintrag erhalten, wird aber nicht zur neuen führenden Issue für RZL Mobile.
+
 ## Direkt über die Weboberfläche veröffentlichen
 
 1. [RZL Editor öffnen](https://github.com/rebootzombie/rzl-ki-protokoll/issues/new?template=protokoll-beitrag.yml) und als **rebootzombie** bei GitHub anmelden.
