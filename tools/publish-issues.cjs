@@ -1,7 +1,7 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
 const {publish,buildViews,RZL,root}=require('../aktualisieren.cjs');
-const {authorized,ingest}=require('./issue-publication.cjs');
+const {authorized,ingest,ingestComment}=require('./issue-publication.cjs');
 const REPO='rebootzombie/rzl-ki-protokoll',BASE='https://rebootzombie.github.io/rzl-ki-protokoll/';
 if(process.env.GITHUB_REPOSITORY!==REPO)throw Error('Dieses Programm ist auf das RZL-Protokoll-Repository beschränkt.');
 const token=process.env.GH_TOKEN;if(!token)throw Error('Kurzlebiges Workflow-Token fehlt.');
@@ -10,22 +10,41 @@ async function commentsOnce(number,body){const comments=await api('/issues/'+num
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function main(){
  if(process.argv[2]==='confirm'){
-  const state=JSON.parse(fs.readFileSync('.publication-state.json','utf8'));if(!state.accepted.length)return;
+  const state=JSON.parse(fs.readFileSync('.publication-state.json','utf8'));if(!state.accepted.length&&!(state.followups||[]).length)return;
   let live;
-  for(let attempt=0;attempt<18;attempt++){const r=await fetch(BASE+'protokoll.json',{cache:'no-store'});if(r.ok){live=await r.json();if(live.revision>=state.revision&&state.accepted.every(a=>live.entries.some(e=>e.id===a.id&&e.source?.number===a.number)))break;}if(attempt<17)await delay(10000);}
+  for(let attempt=0;attempt<18;attempt++){const r=await fetch(BASE+'protokoll.json',{cache:'no-store'});if(r.ok){live=await r.json();if(live.revision>=state.revision&&state.accepted.every(a=>live.entries.some(e=>e.id===a.id&&e.source?.number===a.number))&&(state.followups||[]).every(a=>live.entries.some(e=>e.id===a.id&&e.source?.type==='github_issue_comment'&&e.source?.comment_id===a.comment_id)))break;}if(attempt<17)await delay(10000);}
   if(!live||live.revision<state.revision||!state.accepted.every(a=>live.entries.some(e=>e.id===a.id&&e.source?.number===a.number)))throw Error('Pages wurde ausgeliefert, aber die neue Version ist am öffentlichen JSON noch nicht bestätigt. Workflow erneut starten.');
   for(const accepted of state.accepted){await commentsOnce(accepted.number,'RZL: Veröffentlicht als **'+accepted.id+'** in Protokollversion **'+String(accepted.revision).padStart(3,'0')+'**.\n\n[Beitrag im Forschungsprotokoll]('+BASE+'#'+accepted.id+') · [Maschinenlesbarer Beitrag]('+BASE+'nachrichten/'+accepted.id+'.json)\n\nDie öffentliche JSON-Auslieferung wurde geprüft.');await api('/issues/'+accepted.number,'PATCH',{state:'closed',state_reason:'completed'});}
+  for(const followup of state.followups||[]){await commentsOnce(followup.number,'RZL: Folgekommentar als **'+followup.id+'** in Protokollversion **'+String(followup.revision).padStart(3,'0')+'** veröffentlicht.\\n\\n[Maschinenlesbarer Beitrag]('+BASE+'nachrichten/'+followup.id+'.json)');}
   console.log('Öffentliche Auslieferung bestätigt; '+state.accepted.length+' Eingaben abgeschlossen.');return;
  }
  const repo=await api('');const head=await api('/git/ref/heads/main');
  const local=cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();if(local!==head.object.sha)throw Error('main wurde inzwischen geändert. Workflow erneut starten.');
  let current=RZL.validate(JSON.parse(fs.readFileSync(path.join(root,'protokoll.json'),'utf8'))),changed=false;
- const state={accepted:[],rejected:[],revision:current.revision};
+ const state={accepted:[],followups:[],rejected:[],revision:current.revision};
  for(let page=1;;page++){
   const issues=await api('/issues?state=open&sort=created&direction=asc&per_page=100&page='+page);
   for(const issue of issues){if(!authorized(issue,repo.owner.id))continue;
    try{const result=ingest(current,issue,repo.owner.id,{RZL,publish});current=result.data;changed=changed||!result.duplicate;state.accepted.push({number:issue.number,id:result.entry.id,revision:result.entry.revision});}
    catch(error){if(!error.isInputError)throw error;state.rejected.push({number:issue.number,error:error.message});await commentsOnce(issue.number,'RZL: Nicht veröffentlicht. '+error.message+' Bitte die Eingabe berichtigen und erneut öffnen.');}
+  }
+  if(issues.length<100)break;
+ }
+ // Kommentare von offenen UND geschlossenen bereits publizierten Prozess-Issues auswerten.
+ // Nur explizit markierte Folgekommentare des Repository-Eigentümers sind Eingaben.
+ for(let page=1;;page++){
+  const issues=await api('/issues?state=all&sort=created&direction=asc&per_page=100&page='+page);
+  for(const issue of issues){
+   if(!authorized(issue,repo.owner.id)||!current.entries.some(e=>e.source?.number===issue.number))continue;
+   for(let cpageno=1;;cpageno++){
+    const comments=await api('/issues/'+issue.number+'/comments?per_page=100&page='+cpageno);
+    for(const comment of comments){
+     if(typeof comment.body!=='string'||!comment.body.startsWith('RZL_FOLLOWUP_BEGIN\\n'))continue;
+     try{const result=ingestComment(current,issue,comment,repo.owner.id,{RZL,publish});current=result.data;changed=changed||!result.duplicate;state.followups.push({number:issue.number,comment_id:comment.id,id:result.entry.id,revision:result.entry.revision});}
+     catch(error){if(!error.isInputError)throw error;state.rejected.push({number:issue.number,comment_id:comment.id,error:error.message});await commentsOnce(issue.number,'RZL: Folgekommentar '+comment.id+' nicht veröffentlicht. '+error.message);}
+    }
+    if(comments.length<100)break;
+   }
   }
   if(issues.length<100)break;
  }
@@ -36,13 +55,13 @@ async function main(){
   function walk(dir){for(const item of fs.readdirSync(path.join(root,dir),{withFileTypes:true})){const rel=path.posix.join(dir,item.name);if(item.isDirectory()&&['aenderungen','versionen','sitzungen','nachrichten'].includes(rel))walk(rel);else if(item.isFile()&&rel.endsWith('.json'))files.push({path:rel,mode:'100644',type:'blob',content:fs.readFileSync(path.join(root,rel),'utf8')});}}
   walk('');
   const tree=await api('/git/trees','POST',{base_tree:oldCommit.tree.sha,tree:files});
-  const commit=await api('/git/commits','POST',{message:'Protokoll '+current.protocol_version+': GitHub-Formular '+state.accepted.map(a=>'#'+a.number).join(', '),tree:tree.sha,parents:[head.object.sha]});
+  const commit=await api('/git/commits','POST',{message:'Protokoll '+current.protocol_version+': GitHub-Formular '+state.accepted.map(a=>'#'+a.number).concat(state.followups.map(a=>'#'+a.number+' Kommentar '+a.comment_id)).join(', '),tree:tree.sha,parents:[head.object.sha]});
   await api('/git/refs/heads/main','PATCH',{sha:commit.sha,force:false});
   console.log('Version '+current.protocol_version+' in Git versioniert.');
  }
  state.revision=current.revision;fs.writeFileSync('.publication-state.json',JSON.stringify(state));
  const publicDir=path.join(root,'.public');fs.mkdirSync(publicDir,{recursive:true});
  for(const item of fs.readdirSync(root,{withFileTypes:true})){if(['.git','.github','.public','tools','tests','node_modules'].includes(item.name)||item.name.startsWith('.publication-'))continue;if(item.isDirectory()&&!['aenderungen','versionen','sitzungen','nachrichten'].includes(item.name))continue;if(item.isFile()&&!/\.(html|json|cjs|md|txt)$/.test(item.name)&&!['.nojekyll','_headers'].includes(item.name))continue;fs.cpSync(path.join(root,item.name),path.join(publicDir,item.name),{recursive:true});}
- console.log('Pages-Artefakt vorbereitet. Akzeptiert: '+state.accepted.length+', abgelehnt: '+state.rejected.length+'.');
+ console.log('Pages-Artefakt vorbereitet. Akzeptiert: '+state.accepted.length+', Folgekommentare: '+state.followups.length+', abgelehnt: '+state.rejected.length+'.');
 }
 main().catch(error=>{console.error(error.message);process.exitCode=1;});
