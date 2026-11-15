@@ -4,6 +4,8 @@ on:
     branches: [main]
   issues:
     types: [opened, reopened]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
 permissions: {}
 concurrency:
@@ -11,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   publish:
-    if: github.repository == 'rebootzombie/rzl-ki-protokoll' && (github.event_name != 'issues' || github.event.issue.user.id == github.event.repository.owner.id)
+    if: github.repository == 'rebootzombie/rzl-ki-protokoll' && ((github.event_name != 'issues' && github.event_name != 'issue_comment') || (github.event.issue.user.id == github.event.repository.owner.id && (github.event_name != 'issue_comment' || github.event.comment.user.id == github.event.repository.owner.id)))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
