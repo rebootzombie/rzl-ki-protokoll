@@ -15,7 +15,7 @@ async function main(){
   for(let attempt=0;attempt<18;attempt++){const r=await fetch(BASE+'protokoll.json',{cache:'no-store'});if(r.ok){live=await r.json();if(live.revision>=state.revision&&state.accepted.every(a=>live.entries.some(e=>e.id===a.id&&e.source?.number===a.number))&&(state.followups||[]).every(a=>live.entries.some(e=>e.id===a.id&&e.source?.type==='github_issue_comment'&&e.source?.comment_id===a.comment_id)))break;}if(attempt<17)await delay(10000);}
   if(!live||live.revision<state.revision||!state.accepted.every(a=>live.entries.some(e=>e.id===a.id&&e.source?.number===a.number)))throw Error('Pages wurde ausgeliefert, aber die neue Version ist am öffentlichen JSON noch nicht bestätigt. Workflow erneut starten.');
   for(const accepted of state.accepted){await commentsOnce(accepted.number,'RZL: Veröffentlicht als **'+accepted.id+'** in Protokollversion **'+String(accepted.revision).padStart(3,'0')+'**.\n\n[Beitrag im Forschungsprotokoll]('+BASE+'#'+accepted.id+') · [Maschinenlesbarer Beitrag]('+BASE+'nachrichten/'+accepted.id+'.json)\n\nDie öffentliche JSON-Auslieferung wurde geprüft.');await api('/issues/'+accepted.number,'PATCH',{state:'closed',state_reason:'completed'});}
-  for(const followup of state.followups||[]){await commentsOnce(followup.number,'RZL: Folgekommentar als **'+followup.id+'** in Protokollversion **'+String(followup.revision).padStart(3,'0')+'** veröffentlicht.\\n\\n[Maschinenlesbarer Beitrag]('+BASE+'nachrichten/'+followup.id+'.json)');}
+  for(const followup of state.followups||[]){await commentsOnce(followup.number,'RZL: Folgekommentar als **'+followup.id+'** in Protokollversion **'+String(followup.revision).padStart(3,'0')+'** veröffentlicht.\n\n[Maschinenlesbarer Beitrag]('+BASE+'nachrichten/'+followup.id+'.json)');}
   console.log('Öffentliche Auslieferung bestätigt; '+state.accepted.length+' Eingaben abgeschlossen.');return;
  }
  const repo=await api('');const head=await api('/git/ref/heads/main');
@@ -39,7 +39,7 @@ async function main(){
    for(let cpageno=1;;cpageno++){
     const comments=await api('/issues/'+issue.number+'/comments?per_page=100&page='+cpageno);
     for(const comment of comments){
-     if(typeof comment.body!=='string'||!comment.body.startsWith('RZL_FOLLOWUP_BEGIN\\n'))continue;
+     if(typeof comment.body!=='string'||!comment.body.startsWith('RZL_FOLLOWUP_BEGIN\n'))continue;
      try{const result=ingestComment(current,issue,comment,repo.owner.id,{RZL,publish});current=result.data;changed=changed||!result.duplicate;state.followups.push({number:issue.number,comment_id:comment.id,id:result.entry.id,revision:result.entry.revision});}
      catch(error){if(!error.isInputError)throw error;state.rejected.push({number:issue.number,comment_id:comment.id,error:error.message});await commentsOnce(issue.number,'RZL: Folgekommentar '+comment.id+' nicht veröffentlicht. '+error.message);}
     }
