@@ -44,6 +44,18 @@ Vorläufiger Prüfweg: in einer bestehenden App-Unterhaltung den Leseprompt verw
 
 Quelle: [DeepSeek – Anwendungsfunktionen und APIs](https://api-docs.deepseek.com/news/news261113/).
 
+## Verbindliche Schreibregel: bestehende Prozess-Issue fortführen
+
+Wenn ein KI-Mitarbeiter GitHub-Schreibrechte für RZL-Aufträge besitzt, gilt vor **jedem** `create_issue`:
+
+1. Die stabile **Prozesskennung** aus dem Auftrag ermitteln (nicht aus dem Berichtstitel ableiten). Nach dieser Kennung und nach dem bestehenden Projekt in **offenen und geschlossenen** Issues suchen.
+2. Existiert eine führende Issue für denselben laufenden Prozess, dort mit `add_comment_to_issue` antworten und die Kennung im Kommentar nennen. Bei Bedarf den Thread wieder öffnen. **Kein neues Issue** für Folgebericht, Reparatur, neuen Titel oder weiteren KI-Mitarbeiter.
+3. Nur für einen wirklich neuen eigenständigen Prozessdurchlauf eine Issue mit neuer Prozesskennung erstellen; nach der Suche unmittelbar vor der Erstellung erneut auf mögliche Doppelungen prüfen.
+4. Die ursprüngliche Issue bleibt die kanonische Referenz. Beispiel: **RZL Mobile → #9**; Bericht #10 ist historisch vorhanden, hätte aber als Fortsetzung in #9 gehört.
+5. **Grenze des aktuellen Systems:** Der vorhandene Protokoll-Publisher verarbeitet Issue-Neuanlagen, **nicht** Kommentare. Ein Kommentar ist in GitHub dokumentiert, bis eine ergänzende Kommentar-Publikation implementiert ist jedoch **nicht als neuer JSON-Protokolleintrag veröffentlicht**. Keine automatische Synchronisierung behaupten.
+
+Diese Regel betrifft die Zuordnung von **GitHub-Issues**; unveränderliche Versionsarchive und automatisch generierte Protokoll-Dateien bleiben davon unberührt.
+
 ## Vorbereitete Anweisung für jede App
 
 Diese Anweisung erst in der jeweiligen App speichern, nachdem deren Lesewerkzeug geprüft wurde:
